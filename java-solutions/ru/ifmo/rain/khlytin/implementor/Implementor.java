@@ -271,20 +271,19 @@ public class Implementor implements Impler {
     private static void implementExecutable(Executable executable, BufferedWriter writer, String executableName)
             throws IOException {
         //No reason to use StringBuilder here, casual String is ok here
-        StringBuilder res = new StringBuilder();
 
-        res.append(TAB).append(getModifiersString(executable.getModifiers())).append(SPACE)
-                .append(getReturnType(executable)).append(SPACE)
-                .append(executableName)
-                .append(getArguments(executable, true))
-                .append(getExceptions(executable)).append(SPACE).append("{").append(SPACE).append(EOLN)
-                .append(DOUBLE_TAB).append((executable instanceof Method)
+        String res = TAB + getModifiersString(executable.getModifiers()) + SPACE +
+                getReturnType(executable) + SPACE +
+                executableName +
+                getArguments(executable, true) +
+                getExceptions(executable) + SPACE + "{" + SPACE + EOLN +
+                DOUBLE_TAB + ((executable instanceof Method)
                 ? "return" + getDefaultValue(((Method) executable).getReturnType())
-                : "super" + getArguments(executable, false)).append(SEMICOLON).append(EOLN)
-                .append(TAB).append("}").append(EOLN)
-                .append(EOLN);
-
-        writer.write(toUnicode(res.toString()));
+                : "super" + getArguments(executable, false)) +
+                SEMICOLON + EOLN +
+                TAB + "}" + EOLN +
+                EOLN;
+        writer.write(toUnicode(res));
     }
 
     /**

@@ -8,9 +8,11 @@ cd %pathToThisScript%
 cd ..\..\..\..\..\..\..\
 SET externalFolder=%CD%
 cd %pathToThisScript%
+cd ..\..\..\..\..\
+SET src=%CD%
+cd %pathToThisScript%
 
 SET outFolder=%pathToThisScript%\_build
-SET src=%externalFolder%\java-advanced-2020-solutions\java-solutions
 SET artifacts=%externalFolder%\java-advanced-2020\artifacts
 SET lib=%externalFolder%\java-advanced-2020\lib
 SET allLib=%lib%;%artifacts%
