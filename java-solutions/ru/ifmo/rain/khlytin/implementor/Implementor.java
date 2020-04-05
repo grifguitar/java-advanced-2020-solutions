@@ -270,6 +270,7 @@ public class Implementor implements Impler {
      */
     private static void implementExecutable(Executable executable, BufferedWriter writer, String executableName)
             throws IOException {
+        //No reason to use StringBuilder here, casual String is ok here
         StringBuilder res = new StringBuilder();
 
         res.append(TAB).append(getModifiersString(executable.getModifiers())).append(SPACE)
