@@ -1,6 +1,7 @@
 package ru.ifmo.rain.khlytin.concurrent;
 
 import info.kgeorgiy.java.advanced.concurrent.ListIP;
+import info.kgeorgiy.java.advanced.mapper.ParallelMapper;
 
 import java.util.*;
 import java.util.function.Function;
@@ -14,6 +15,23 @@ import java.util.stream.Stream;
  * @author khlyting
  */
 public class IterativeParallelism implements ListIP {
+    private final ParallelMapper mapper;
+
+    /**
+     * Mapper constructor.
+     *
+     * @param mapper {@link ParallelMapper} instance
+     */
+    public IterativeParallelism(ParallelMapper mapper) {
+        this.mapper = mapper;
+    }
+
+    /**
+     * Default constructor.
+     */
+    public IterativeParallelism() {
+        this.mapper = null;
+    }
 
     private <T, M, R> R commonTask(int threads, List<? extends T> values,
                                    Function<Stream<? extends T>, M> process,
@@ -34,27 +52,31 @@ public class IterativeParallelism implements ListIP {
 
         List<M> counted;
 
-        counted = new ArrayList<>(Collections.nCopies(parts.size(), null));
-        List<Thread> workers = new ArrayList<>();
-        for (int i = 0; i < parts.size(); i++) {
-            final int index = i;
-            Thread thread = new Thread(() -> counted.set(index, process.apply(parts.get(index))));
-            workers.add(thread);
-            thread.start();
-        }
-
-        List<InterruptedException> exceptions = new ArrayList<>();
-        workers.forEach(thread -> {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                exceptions.add(e);
+        if (mapper == null) {
+            counted = new ArrayList<>(Collections.nCopies(parts.size(), null));
+            List<Thread> workers = new ArrayList<>();
+            for (int i = 0; i < parts.size(); i++) {
+                final int index = i;
+                Thread thread = new Thread(() -> counted.set(index, process.apply(parts.get(index))));
+                workers.add(thread);
+                thread.start();
             }
-        });
-        if (!exceptions.isEmpty()) {
-            InterruptedException joinFail = new InterruptedException("Some threads were interrupted");
-            exceptions.forEach(joinFail::addSuppressed);
-            throw joinFail;
+
+            List<InterruptedException> exceptions = new ArrayList<>();
+            workers.forEach(thread -> {
+                try {
+                    thread.join();
+                } catch (InterruptedException e) {
+                    exceptions.add(e);
+                }
+            });
+            if (!exceptions.isEmpty()) {
+                InterruptedException joinFail = new InterruptedException("Some threads were interrupted");
+                exceptions.forEach(joinFail::addSuppressed);
+                throw joinFail;
+            }
+        } else {
+            counted = mapper.map(process, parts);
         }
 
         return reduce.apply(counted.stream());
