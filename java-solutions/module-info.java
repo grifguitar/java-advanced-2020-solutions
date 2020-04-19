@@ -9,6 +9,7 @@ module ru.ifmo.rain.khlytin.implementor {
     requires transitive info.kgeorgiy.java.advanced.implementor;
     requires java.compiler;
     requires info.kgeorgiy.java.advanced.concurrent;
+    requires info.kgeorgiy.java.advanced.mapper;
 
     exports ru.ifmo.rain.khlytin.implementor;
 }
