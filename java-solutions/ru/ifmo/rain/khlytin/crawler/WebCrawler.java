@@ -54,6 +54,7 @@ public class WebCrawler implements Crawler {
     }
 
     private class Handler {
+    	//too big interface
         private final ConcurrentLinkedQueue<String> waitingQueue = new ConcurrentLinkedQueue<>();
         private final Set<String> win = ConcurrentHashMap.newKeySet();
         private final ConcurrentMap<String, IOException> lose = new ConcurrentHashMap<>();
