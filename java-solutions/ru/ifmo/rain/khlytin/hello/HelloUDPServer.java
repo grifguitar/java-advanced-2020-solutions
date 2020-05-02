@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
  * @author khlyting
  */
 public class HelloUDPServer implements HelloServer {
+    //finals?
     private static final int TERMINATION_AWAIT = 1;
     private DatagramSocket socket;
     private ExecutorService mainExecutor;
