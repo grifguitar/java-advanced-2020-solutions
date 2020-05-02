@@ -12,6 +12,7 @@ module ru.ifmo.rain.khlytin.implementor {
     requires info.kgeorgiy.java.advanced.mapper;
     requires info.kgeorgiy.java.advanced.student;
     requires info.kgeorgiy.java.advanced.crawler;
+    requires info.kgeorgiy.java.advanced.hello;
 
     exports ru.ifmo.rain.khlytin.implementor;
 }
