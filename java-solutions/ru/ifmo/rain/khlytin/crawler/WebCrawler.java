@@ -25,24 +25,17 @@ public class WebCrawler implements Crawler {
         this.hostMapper = new ConcurrentHashMap<>();
     }
 
-    private static int getByIndex(int index, String[] args) {
-        if (index < args.length) {
-            return Integer.parseInt(args[index]);
-        }
-        return 1;
-    }
-
     public static void main(String[] args) {
         if (args == null || args.length == 0 || Arrays.stream(args).anyMatch(Objects::isNull)) {
             System.err.println("No null arguments expected: url [depth [downloads [extractors [perHost]]]]");
         } else {
             try {
-                int depth = getByIndex(1, args);
-                int downloaders = getByIndex(2, args);
-                int extractors = getByIndex(3, args);
-                int perHost = getByIndex(4, args);
+                int depth = (1 < args.length) ? Integer.parseInt(args[1]) : 1;
+                int downloaders = (2 < args.length) ? Integer.parseInt(args[2]) : 1;
+                int extractors = (3 < args.length) ? Integer.parseInt(args[3]) : 1;
+                int perHost = (4 < args.length) ? Integer.parseInt(args[4]) : 1;
 
-                try (Crawler crawler = new WebCrawler(new CachingDownloader(), downloaders, extractors, perHost)) {
+                try (WebCrawler crawler = new WebCrawler(new CachingDownloader(), downloaders, extractors, perHost)) {
                     crawler.download(args[0], depth);
                 } catch (IOException e) {
                     System.err.println("Failed to initialize downloader: " + e.getMessage());
@@ -50,75 +43,6 @@ public class WebCrawler implements Crawler {
             } catch (NumberFormatException e) {
                 System.err.println("Only numeric arguments expected");
             }
-        }
-    }
-
-    private class Handler {
-    	//too big interface
-        private final ConcurrentLinkedQueue<String> waitingQueue = new ConcurrentLinkedQueue<>();
-        private final Set<String> win = ConcurrentHashMap.newKeySet();
-        private final ConcurrentMap<String, IOException> lose = new ConcurrentHashMap<>();
-        private final Phaser lock = new Phaser(1);
-
-        public Handler(String url, int depth) {
-            final Set<String> extracted = ConcurrentHashMap.newKeySet();
-            waitingQueue.add(url);
-            lock.register();
-            for (int i = 0; i < depth; i++) {
-                int currentDepth = depth - i;
-                final Phaser level = new Phaser(1);
-                List<String> processing = new ArrayList<>(waitingQueue);
-                waitingQueue.clear();
-                processing.stream()
-                        .filter(extracted::add)
-                        .forEach(link -> queueDownload(link, currentDepth, level));
-                level.arriveAndAwaitAdvance();
-            }
-            lock.arrive();
-        }
-
-        public Result result() {
-            lock.arriveAndAwaitAdvance();
-            return new Result(new ArrayList<>(win), lose);
-        }
-
-        private void queueDownload(final String link, final int depth, final Phaser level) {
-            String host;
-            try {
-                host = URLUtils.getHost(link);
-            } catch (MalformedURLException e) {
-                lose.put(link, e);
-                return;
-            }
-
-            HostData hostData = hostMapper.computeIfAbsent(host, s -> new HostData());
-            level.register();
-            hostData.addTask(() -> {
-                try {
-                    Document document = downloader.download(link);
-                    win.add(link);
-                    if (depth > 1) {
-                        queueExtraction(document, level);
-                    }
-                } catch (IOException e) {
-                    lose.put(link, e);
-                } finally {
-                    level.arrive();
-                }
-            });
-        }
-
-        private void queueExtraction(final Document document, final Phaser level) {
-            level.register();
-            extractorsPool.submit(() -> {
-                try {
-                    List<String> links = document.extractLinks();
-                    waitingQueue.addAll(links);
-                } catch (IOException ignored) {
-                } finally {
-                    level.arrive();
-                }
-            });
         }
     }
 
@@ -131,12 +55,12 @@ public class WebCrawler implements Crawler {
             count = 0;
         }
 
-        synchronized public void addTask(Runnable task) {
+        public synchronized void addTask(Runnable task) {
             waitingTasks.add(task);
             checkedCall(false);
         }
 
-        synchronized private void callNext() {
+        private synchronized void callNext() {
             Runnable task = waitingTasks.poll();
             if (task != null) {
                 count++;
@@ -150,7 +74,7 @@ public class WebCrawler implements Crawler {
             }
         }
 
-        synchronized private void checkedCall(boolean finished) {
+        private synchronized void checkedCall(boolean finished) {
             if (finished) {
                 count--;
             }
@@ -160,20 +84,77 @@ public class WebCrawler implements Crawler {
         }
     }
 
+    private void queueDownload(final String link, final int depth, final Phaser level,
+                               final Set<String> win, final ConcurrentMap<String, IOException> lose,
+                               final ConcurrentLinkedQueue<String> waitingQueue) {
+        String host;
+        try {
+            host = URLUtils.getHost(link);
+        } catch (MalformedURLException e) {
+            lose.put(link, e);
+            return;
+        }
+
+        HostData hostData = hostMapper.computeIfAbsent(host, s -> new HostData());
+        level.register();
+        hostData.addTask(() -> {
+            try {
+                Document document = downloader.download(link);
+                win.add(link);
+                if (depth > 1) {
+                    queueExtraction(document, level, waitingQueue);
+                }
+            } catch (IOException e) {
+                lose.put(link, e);
+            } finally {
+                level.arrive();
+            }
+        });
+    }
+
+    private void queueExtraction(final Document document, final Phaser level,
+                                 final ConcurrentLinkedQueue<String> waitingQueue) {
+        level.register();
+        extractorsPool.submit(() -> {
+            try {
+                List<String> links = document.extractLinks();
+                waitingQueue.addAll(links);
+            } catch (IOException ignored) {
+            } finally {
+                level.arrive();
+            }
+        });
+    }
+
     @Override
     public Result download(String url, int depth) {
-        return new Handler(url, depth).result();
+        final ConcurrentLinkedQueue<String> waitingQueue = new ConcurrentLinkedQueue<>();
+        final Set<String> win = ConcurrentHashMap.newKeySet();
+        final ConcurrentMap<String, IOException> lose = new ConcurrentHashMap<>();
+        final Phaser lock = new Phaser(1);
+
+        final Set<String> extracted = ConcurrentHashMap.newKeySet();
+        waitingQueue.add(url);
+        lock.register();
+        for (int i = 0; i < depth; i++) {
+            int currentDepth = depth - i;
+            final Phaser level = new Phaser(1);
+            List<String> processing = new ArrayList<>(waitingQueue);
+            waitingQueue.clear();
+            processing.stream()
+                    .filter(extracted::add)
+                    .forEach(link -> queueDownload(link, currentDepth, level, win, lose, waitingQueue));
+            level.arriveAndAwaitAdvance();
+        }
+        lock.arrive();
+
+        lock.arriveAndAwaitAdvance();
+        return new Result(new ArrayList<>(win), lose);
     }
 
     @Override
     public void close() {
-        extractorsPool.shutdown();
-        downloadersPool.shutdown();
-        try {
-            extractorsPool.awaitTermination(0, TimeUnit.MILLISECONDS);
-            downloadersPool.awaitTermination(0, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            System.err.println("Could not terminate executor pools: " + e.getMessage());
-        }
+        extractorsPool.shutdownNow();
+        downloadersPool.shutdownNow();
     }
 }
