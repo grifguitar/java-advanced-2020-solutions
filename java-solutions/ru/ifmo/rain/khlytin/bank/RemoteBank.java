@@ -1,6 +1,7 @@
 package ru.ifmo.rain.khlytin.bank;
 
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -8,10 +9,10 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 public class RemoteBank implements Bank {
-    private int port;
-    private ConcurrentMap<String, Account> bankAccounts = new ConcurrentHashMap<>();
-    private ConcurrentMap<String, Person> persons = new ConcurrentHashMap<>();
-    private ConcurrentMap<String, Set<String>> personAccounts = new ConcurrentHashMap<>();
+    private final int port;
+    private final ConcurrentMap<String, Account> bankAccounts = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, Person> persons = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, Set<String>> personAccounts = new ConcurrentHashMap<>();
 
     RemoteBank(int port) {
         this.port = port;
@@ -22,7 +23,9 @@ public class RemoteBank implements Bank {
             return false;
         }
         String bankAccountID = person.getPassportID() + ":" + subID;
-        bankAccounts.put(bankAccountID, new RemoteAccount(subID, port));
+        Account account = new RemoteAccount(subID);
+        UnicastRemoteObject.exportObject(account, port);
+        bankAccounts.put(bankAccountID, account);
 
         if (personAccounts.get(person.getPassportID()) == null) {
             personAccounts.put(person.getPassportID(), new ConcurrentSkipListSet<>());
@@ -68,11 +71,11 @@ public class RemoteBank implements Bank {
         }
 
         Set<String> allSubID = getAllSubID(person);
-        Map<String, LocalAccount> personAccounts = new ConcurrentHashMap<>();
+        Map<String, Account> personAccounts = new ConcurrentHashMap<>();
         allSubID.forEach((subID) -> {
             try {
                 Account account = getAccount(subID, person);
-                personAccounts.put(subID, new LocalAccount(account.getID(), account.getAmount()));
+                personAccounts.put(subID, new RemoteAccount(account.getID(), account.getAmount()));
             } catch (RemoteException e) {
                 System.err.println("Unable to create local account: " + e.getMessage());
             }
@@ -92,7 +95,9 @@ public class RemoteBank implements Bank {
         if (name == null || surname == null || persons.get(passportID) != null) {
             return false;
         }
-        persons.put(passportID, new RemotePerson(name, surname, passportID, port));
+        RemotePerson person = new RemotePerson(name, surname, passportID);
+        UnicastRemoteObject.exportObject(person, port);
+        persons.put(passportID, person);
         personAccounts.put(passportID, new ConcurrentSkipListSet<>());
         return true;
     }
