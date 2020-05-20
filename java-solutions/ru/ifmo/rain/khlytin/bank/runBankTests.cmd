@@ -1,31 +1,16 @@
 @ECHO off
-
-SET initDir=%CD%
-
-SET pathToThisScript=%~dp0
-SET pathToThisScript=%pathToThisScript:~0,-1%
-cd %pathToThisScript%
+SET initPath=%~dp0
+SET initPath=%initPath:~0,-1%
 cd ..\..\..\..\..\..\..\
-SET externalFolder=%CD%
-cd %pathToThisScript%
-cd ..\..\..\..\..\
 SET src=%CD%
-cd %pathToThisScript%
-
-SET outFolder=%pathToThisScript%\_build
-SET lib=%externalFolder%\java-advanced-2020\lib
-
-SET modPath=ru\ifmo\rain\khlytin\bank
-SET modName=ru.ifmo.rain.khlytin.bank
-
+SET lib=%src%\java-advanced-2020\lib
+SET classpath=ru\ifmo\rain\khlytin\bank
+SET classname=ru.ifmo.rain.khlytin.bank
+SET outFolder=%initPath%\_build
+cd %initPath%
 mkdir "%outFolder%"
-javac -cp "%lib%"\junit-4.11.jar "%src%"\%modPath%\*.java -d "%outFolder%"
-
+javac -cp "%lib%"\junit-4.11.jar "%src%"\java-advanced-2020-solutions\java-solutions\%classpath%\*.java -d "%outFolder%"
 cd "%outFolder%"
-java -cp "%lib%"\junit-4.11.jar;"%lib%"\hamcrest-core-1.3.jar;"%outFolder%" %modName%.BankTests
-
-set exitcode=%ERRORLEVEL%
-
-cd %initDir%
-
-EXIT %exitcode%
+java -cp "%lib%"\junit-4.11.jar;"%lib%"\hamcrest-core-1.3.jar;"%outFolder%" %classname%.BankTests
+SET code=%ERRORLEVEL%
+EXIT %code%
