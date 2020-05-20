@@ -126,6 +126,8 @@ public class WebCrawler implements Crawler {
         });
     }
 
+    //
+
     @Override
     public Result download(String url, int depth) {
         final ConcurrentLinkedQueue<String> waitingQueue = new ConcurrentLinkedQueue<>();
