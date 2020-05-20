@@ -3,6 +3,7 @@ package ru.ifmo.rain.khlytin.bank;
 import java.io.Serializable;
 
 public class LocalAccount implements Account, Serializable {
+    //finals?
     private String id;
     private int amount;
 
