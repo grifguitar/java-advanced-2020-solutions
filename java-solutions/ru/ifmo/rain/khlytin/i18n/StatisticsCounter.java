@@ -161,7 +161,9 @@ public class StatisticsCounter {
         result.occurrencesNumber = currencies.size();
         result.diffValuesNumber = (int) currencies.stream().distinct().count();
         double minValue = currencies.get(0).first.doubleValue();
+        result.minStringValue = currencies.get(0).second;
         double maxValue = currencies.get(0).first.doubleValue();
+        result.maxStringValue =currencies.get(0).second;
         result.minLengthString = currencies.get(0).second;
         result.maxLengthString = currencies.get(0).second;
         for (CurrencyData data : currencies) {
@@ -192,7 +194,9 @@ public class StatisticsCounter {
         result.occurrencesNumber = dates.size();
         result.diffValuesNumber = (int) dates.stream().distinct().count();
         Calendar minValue = dates.get(0).first;
+        result.minStringValue = dates.get(0).second;
         Calendar maxValue = dates.get(0).first;
+        result.maxStringValue = dates.get(0).second;
         result.minLengthString = dates.get(0).second;
         result.maxLengthString = dates.get(0).second;
         for (CalendarData data : dates) {
