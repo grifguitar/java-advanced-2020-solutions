@@ -20,6 +20,6 @@ public class Server {
         } catch (final RemoteException | MalformedURLException e) {
             System.err.println(e.getMessage());
         }
-        System.out.println("Server started");
+        System.out.println("Server is running");
     }
 }

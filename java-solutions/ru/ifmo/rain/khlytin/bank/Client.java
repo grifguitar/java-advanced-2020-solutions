@@ -28,10 +28,10 @@ public class Client {
             String subID = args[3];
             int amount = Integer.parseInt(args[4]);
 
-            Person person = bank.getRemotePerson(passportID);
+            Person person = bank.getPerson(passportID, "Remote");
             if (person == null) {
                 bank.createPerson(name, surname, passportID);
-                person = bank.getRemotePerson(passportID);
+                person = bank.getPerson(passportID, "Remote");
             } else {
                 if (!person.getName().equals(name) || !person.getSurname().equals(surname)) {
                     System.err.println("Incorrect personal data");
@@ -39,11 +39,11 @@ public class Client {
                 }
             }
 
-            Account account = bank.getAccount(subID, person);
+            Account account = bank.getAccount(person, subID);
             if (!bank.getAllSubID(person).contains(subID)) {
                 if (account == null) {
-                    bank.createAccount(subID, person);
-                    account = bank.getAccount(subID, person);
+                    bank.createAccount(person.getPassportID() + ":" + subID);
+                    account = bank.getAccount(person, subID);
                 } else {
                     System.err.println("Account already exists");
                     return;

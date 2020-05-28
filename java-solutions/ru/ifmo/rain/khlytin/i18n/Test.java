@@ -10,13 +10,6 @@ public class Test {
     public static void beforeClass() {
     }
 
-//    @org.junit.Test
-//    public void test1() {
-//        String[] args = {"en_US", "ru_RU", "java-solutions\\ru\\ifmo\\rain\\khlytin\\i18n\\input.txt",
-//                "java-solutions\\ru\\ifmo\\rain\\khlytin\\i18n\\output.html"};
-//        TextStatistics.main(args);
-//    }
-
     @org.junit.Test
     public void test2() {
         StatisticsCounter worker = new StatisticsCounter("$300", Locale.US);
