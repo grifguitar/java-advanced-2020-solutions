@@ -4,7 +4,6 @@ import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 public class Server {
@@ -14,7 +13,7 @@ public class Server {
     public static void main(final String... args) {
         final Bank bank = new RemoteBank(PORT);
         try {
-            Registry rmiRegistry = LocateRegistry.createRegistry(PORT);
+            LocateRegistry.createRegistry(PORT);
             UnicastRemoteObject.exportObject(bank, PORT);
             Naming.rebind(URL, bank);
         } catch (final RemoteException | MalformedURLException e) {

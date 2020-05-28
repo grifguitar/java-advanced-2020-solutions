@@ -6,7 +6,6 @@ import org.junit.Assert;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Random;
 import java.util.Set;
@@ -22,13 +21,13 @@ public class Test {
     @BeforeClass
     public static void beforeClass() throws Exception {
         bank = new RemoteBank(PORT);
-        Registry rmiRegistry = LocateRegistry.createRegistry(PORT);
+        LocateRegistry.createRegistry(PORT);
         UnicastRemoteObject.exportObject(bank, PORT);
         Naming.rebind(URL, bank);
     }
 
     @org.junit.Test
-    public void createAccountTest() throws RemoteException {
+    public void test1() throws RemoteException {
         String name = "test01User";
         String surname = "1";
         String passportID = "test01PassportID1";
@@ -48,7 +47,7 @@ public class Test {
     }
 
     @org.junit.Test
-    public void getAccountsTest() throws RemoteException {
+    public void test2() throws RemoteException {
         for (int i = 0; i < MAX_COUNT; i++) {
             String name = "test02User";
             String surname = Integer.toString(i);
@@ -70,7 +69,7 @@ public class Test {
     }
 
     @org.junit.Test
-    public void createPersonTest() throws RemoteException {
+    public void test3() throws RemoteException {
         for (int i = 0; i < MAX_COUNT; i++) {
             String name = "test03User" + i;
             String surname = "";
@@ -90,95 +89,109 @@ public class Test {
     }
 
     @org.junit.Test
-    public void getPersonTest() throws RemoteException {
+    public void test4() throws RemoteException {
         Assert.assertNull(bank.getPerson(Integer.toString(-1), LOCAL));
         Assert.assertNull(bank.getPerson(Integer.toString(-1), REMOTE));
-
         for (int i = 0; i < MAX_COUNT; i++) {
-            bank.createPerson("test04User" + i, "", "test04PassportID" + i);
+            String name = "test04User" + i;
+            String surname = "";
+            String passportID = "test04PassportID" + i;
 
-            Person remotePerson = bank.getPerson("test04PassportID" + i, REMOTE);
-            Assert.assertEquals("test04User" + i, remotePerson.getName());
-            Assert.assertEquals("", remotePerson.getSurname());
-            Assert.assertEquals("test04PassportID" + i, remotePerson.getPassportID());
+            bank.createPerson(name, surname, passportID);
 
-            Person localPerson = bank.getPerson("test04PassportID" + i, LOCAL);
-            Assert.assertEquals("test04User" + i, localPerson.getName());
-            Assert.assertEquals("", localPerson.getSurname());
-            Assert.assertEquals("test04PassportID" + i, localPerson.getPassportID());
+            Person remotePerson = bank.getPerson(passportID, REMOTE);
+            Assert.assertEquals(name, remotePerson.getName());
+            Assert.assertEquals(surname, remotePerson.getSurname());
+            Assert.assertEquals(passportID, remotePerson.getPassportID());
+
+            Person localPerson = bank.getPerson(passportID, LOCAL);
+            Assert.assertEquals(name, localPerson.getName());
+            Assert.assertEquals(surname, localPerson.getSurname());
+            Assert.assertEquals(passportID, localPerson.getPassportID());
         }
     }
 
     @org.junit.Test
-    public void localAfterRemoteTest() throws RemoteException {
-        bank.createPerson("test05User", "1", "test05PassportID1");
-        Person remotePerson = bank.getPerson("test05PassportID1", REMOTE);
+    public void test5() throws RemoteException {
+        String name = "test05User";
+        String surname = "1";
+        String passportID = "test05PassportID1";
+        String subID = "1";
 
+        bank.createPerson(name, surname, passportID);
+        Person remotePerson = bank.getPerson(passportID, REMOTE);
         Assert.assertNotNull(remotePerson);
-        Assert.assertTrue(bank.createAccount(remotePerson.getPassportID() + ":" + "1"));
-        Account remoteAccount = bank.getAccount(remotePerson, "1");
+        Assert.assertTrue(bank.createAccount(remotePerson.getPassportID() + ":" + subID));
 
-        Person localPerson1 = bank.getPerson("test05PassportID1", LOCAL);
+        Account remoteAccount = bank.getAccount(remotePerson, subID);
+        Person localPerson1 = bank.getPerson(passportID, LOCAL);
         Assert.assertNotNull(localPerson1);
 
         remoteAccount.setAmount(remoteAccount.getAmount() + 100000);
-
-        Person localPerson2 = bank.getPerson("test05PassportID1", LOCAL);
+        Person localPerson2 = bank.getPerson(passportID, LOCAL);
         Assert.assertNotNull(localPerson2);
 
-        Account localAccount1 = bank.getAccount(localPerson2, "1");
-        Account localAccount2 = bank.getAccount(localPerson1, "1");
-
+        Account localAccount1 = bank.getAccount(localPerson2, subID);
+        Account localAccount2 = bank.getAccount(localPerson1, subID);
         Assert.assertEquals(localAccount1.getAmount(), remoteAccount.getAmount());
         Assert.assertEquals(localAccount2.getAmount() + 100000, localAccount1.getAmount());
     }
 
     @org.junit.Test
-    public void remoteAfterLocalTest() throws RemoteException {
-        bank.createPerson("test06User", "1", "test06PassportID1");
+    public void test6() throws RemoteException {
+        String name = "test06User";
+        String surname = "2";
+        String passportID = "test06PassportID1";
+        String subID = "2";
 
-        Person remotePerson = bank.getPerson("test06PassportID1", REMOTE);
+        bank.createPerson(name, surname, passportID);
+        Person remotePerson = bank.getPerson(passportID, REMOTE);
         Assert.assertNotNull(remotePerson);
+        Assert.assertTrue(bank.createAccount(remotePerson.getPassportID() + ":" + subID));
 
-        Assert.assertTrue(bank.createAccount(remotePerson.getPassportID() + ":" + "1"));
-        Person localPerson = bank.getPerson("test06PassportID1", LOCAL);
+        Person localPerson = bank.getPerson(passportID, LOCAL);
         Assert.assertNotNull(localPerson);
-
-        Account localAccount = bank.getAccount(localPerson, "1");
+        Account localAccount = bank.getAccount(localPerson, subID);
         localAccount.setAmount(localAccount.getAmount() + 100000);
-
-        Account remoteAccount = bank.getAccount(remotePerson, "1");
-
+        Account remoteAccount = bank.getAccount(remotePerson, subID);
         Assert.assertEquals(100000, localAccount.getAmount());
         Assert.assertEquals(0, remoteAccount.getAmount());
     }
 
     @org.junit.Test
-    public void remoteAfterRemoteTest() throws RemoteException {
-        bank.createPerson("test07User", "1", "test07PassportID1");
+    public void test7() throws RemoteException {
+        String name = "test07User";
+        String surname = "1";
+        String passportID = "test07PassportID1";
+        String subID1 = "1";
+        String subID2 = "2";
 
-        Person remotePerson1 = bank.getPerson("test07PassportID1", REMOTE);
-        Person remotePerson2 = bank.getPerson("test07PassportID1", REMOTE);
+        bank.createPerson(name, surname, passportID);
+        Person remotePerson1 = bank.getPerson(passportID, REMOTE);
+        Person remotePerson2 = bank.getPerson(passportID, REMOTE);
 
-        bank.createAccount(remotePerson1.getPassportID() + ":" + "1");
-        bank.createAccount(remotePerson2.getPassportID() + ":" + "2");
-
+        bank.createAccount(remotePerson1.getPassportID() + ":" + subID1);
+        bank.createAccount(remotePerson2.getPassportID() + ":" + subID2);
         Assert.assertEquals(2, bank.getAllSubID(remotePerson1).size());
         Assert.assertEquals(bank.getAllSubID(remotePerson1).size(), bank.getAllSubID(remotePerson2).size());
     }
 
     @org.junit.Test
-    public void localAfterLocalTest() throws RemoteException {
-        bank.createPerson("test08User", "1", "test08PassportID1");
+    public void test8() throws RemoteException {
+        String name = "test08User";
+        String surname = "1";
+        String passportID = "test08PassportID1";
 
-        Person localPerson1 = bank.getPerson("test08PassportID1", LOCAL);
-        Person localPerson2 = bank.getPerson("test08PassportID1", LOCAL);
+        bank.createPerson(name, surname, passportID);
+        Person localPerson1 = bank.getPerson(passportID, LOCAL);
+        Person localPerson2 = bank.getPerson(passportID, LOCAL);
 
-        bank.createAccount(localPerson1.getPassportID() + ":" + "1");
-        bank.createAccount(localPerson2.getPassportID() + ":" + "2");
+        String subID1 = "1";
+        String subID2 = "2";
+        bank.createAccount(localPerson1.getPassportID() + ":" + subID1);
+        bank.createAccount(localPerson2.getPassportID() + ":" + subID2);
 
-        Person localPerson3 = bank.getPerson("test08PassportID1", LOCAL);
-
+        Person localPerson3 = bank.getPerson(passportID, LOCAL);
         Assert.assertEquals(2, bank.getAllSubID(localPerson3).size());
         Assert.assertEquals(0, bank.getAllSubID(localPerson1).size());
         Assert.assertEquals(bank.getAllSubID(localPerson1).size(), bank.getAllSubID(localPerson2).size());
