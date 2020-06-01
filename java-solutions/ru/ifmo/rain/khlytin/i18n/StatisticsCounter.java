@@ -35,7 +35,17 @@ public class StatisticsCounter {
                 break;
         }
         breakIterator.setText(text);
-        if (mode.equals("Sentence") || mode.equals("Line") || mode.equals("Word")) {
+        if (mode.equals("Line")) {
+            String[] lines = text.split(System.lineSeparator());
+//            for (String line : lines) {
+//                System.out.println(line);
+//            }
+            StatisticalData result = getLinesStatistics(lines, cmp);
+            List<StatisticalData> resultList = new ArrayList<>();
+            resultList.add(result);
+            return resultList;
+        }
+        if (mode.equals("Sentence") || mode.equals("Word")) {
             StatisticalData result = new StatisticalData();
             Set<String> terms = new HashSet<>();
             int startIt = breakIterator.first();
@@ -163,7 +173,7 @@ public class StatisticsCounter {
         double minValue = currencies.get(0).first.doubleValue();
         result.minStringValue = currencies.get(0).second;
         double maxValue = currencies.get(0).first.doubleValue();
-        result.maxStringValue =currencies.get(0).second;
+        result.maxStringValue = currencies.get(0).second;
         result.minLengthString = currencies.get(0).second;
         result.maxLengthString = currencies.get(0).second;
         for (CurrencyData data : currencies) {
@@ -215,6 +225,43 @@ public class StatisticsCounter {
                 result.maxLengthString = data.second;
             }
             result.average += data.second.length();
+        }
+        result.average /= result.occurrencesNumber;
+        return result;
+    }
+
+    private static StatisticalData getLinesStatistics(String[] lines, Collator cmp) {
+        StatisticalData result = new StatisticalData();
+        Set<String> terms = new HashSet<>();
+        for (String line : lines) {
+            if (result.occurrencesNumber == 0) {
+                result.maxStringValue = line;
+                result.minStringValue = line;
+                result.maxLengthString = line;
+                result.minLengthString = line;
+            }
+
+            if (!terms.contains(line)) {
+                result.diffValuesNumber++;
+                terms.add(line);
+            }
+            result.occurrencesNumber++;
+
+            if (cmp.compare(result.maxStringValue, line) < 0) {
+                result.maxStringValue = line;
+            }
+            if (cmp.compare(result.minStringValue, line) > 0) {
+                result.minStringValue = line;
+            }
+
+            if (result.maxLengthString.length() < line.length()) {
+                result.maxLengthString = line;
+            }
+            if (result.minLengthString.length() > line.length()) {
+                result.minLengthString = line;
+            }
+
+            result.average += line.length();
         }
         result.average /= result.occurrencesNumber;
         return result;
