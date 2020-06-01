@@ -1,7 +1,1 @@
-$300 Hello
-
-World
-
-1 2 3
-
-!
+pipka
