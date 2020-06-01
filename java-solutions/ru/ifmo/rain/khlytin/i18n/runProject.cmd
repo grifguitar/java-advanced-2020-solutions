@@ -15,6 +15,6 @@ cd %initPath%
 mkdir %outFolder%
 javac -encoding utf8 -cp %allLib% %javaSolutions%\%classpath%\*.java -d %outFolder%
 cd %outFolder%
-java -cp %allLib%;%outFolder% %classname%.TextStatistics ru_RU ru_RU ..\input.txt ..\output.html
+java -cp %allLib%;%outFolder% %classname%.TextStatistics en_US ru_RU ..\input.txt ..\output.html
 cd %initPath%
 rmdir /S /Q %outFolder%
