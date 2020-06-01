@@ -13,8 +13,8 @@ SET allLib=%lib%\junit-4.11.jar;%lib%\hamcrest-core-1.3.jar
 SET outFolder=%initPath%\_build
 cd %initPath%
 mkdir %outFolder%
-javac -cp %allLib% %javaSolutions%\%classpath%\*.java -d %outFolder%
+javac -encoding utf8 -cp %allLib% %javaSolutions%\%classpath%\*.java -d %outFolder%
 cd %outFolder%
-java -cp %allLib%;%outFolder% %classname%.TextStatistics en_US ru_RU ..\input.txt ..\output.html
+java -cp %allLib%;%outFolder% %classname%.TextStatistics ru_RU ru_RU ..\input.txt ..\output.html
 cd %initPath%
 rmdir /S /Q %outFolder%

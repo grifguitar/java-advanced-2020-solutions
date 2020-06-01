@@ -3,6 +3,7 @@ package ru.ifmo.rain.khlytin.i18n;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
@@ -46,7 +47,7 @@ public class TextStatistics {
 
         String text;
         try {
-            text = Files.readString(Paths.get(textFile));
+            text = Files.readString(Paths.get(textFile), StandardCharsets.UTF_8);
         } catch (IOException e) {
             System.err.println("Failed to read input file: " + e.getMessage());
             return;
@@ -80,7 +81,7 @@ public class TextStatistics {
                 words, numbers, currencies, dates, textFile);
 
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(reportFile));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(reportFile, StandardCharsets.UTF_8));
             writer.write(report.getReport());
             writer.close();
         } catch (IOException e) {
