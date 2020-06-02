@@ -41,7 +41,9 @@ public class Report {
         this.dates = dates;
         this.textFile = textFile;
     }
-
+    //should use messageFormat
+    //: should be in bundles
+    //one string is a very bad idea
     public String getReport() {
         return String.format(
                 HTML + EOLN +
