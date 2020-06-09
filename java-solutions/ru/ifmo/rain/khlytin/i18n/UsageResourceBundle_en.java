@@ -37,7 +37,11 @@ public class UsageResourceBundle_en extends ListResourceBundle {
             {"stringRP", "line"},
             {"dateRP", "date"},
             {"mid", "Average"},
-            {"value", "value"}
+            {"value", "value"},
+            {"colon", ":"},
+            {"openBracket", "("},
+            {"closeBracket", ")"},
+            {"space", " "}
     };
 
     protected Object[][] getContents() {

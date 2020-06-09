@@ -37,7 +37,11 @@ public class UsageResourceBundle_ru extends ListResourceBundle {
             {"dateRP", "даты"},
             {"mid", "Среднее"},
             {"number", "число"},
-            {"value", "значение"}
+            {"value", "значение"},
+            {"colon", ":"},
+            {"openBracket", "("},
+            {"closeBracket", ")"},
+            {"space", " "}
     };
 
     protected Object[][] getContents() {

@@ -77,12 +77,11 @@ public class TextStatistics {
             return;
         }
 
-        Report report = new Report(bundle, sentences, lines,
-                words, numbers, currencies, dates, textFile);
-
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(reportFile, StandardCharsets.UTF_8));
-            writer.write(report.getReport());
+            Report report = new Report(bundle, sentences, lines,
+                    words, numbers, currencies, dates, textFile, writer);
+            report.handle();
             writer.close();
         } catch (IOException e) {
             System.err.println("Failed to write to output file: " + e.getMessage());

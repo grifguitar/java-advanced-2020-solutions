@@ -1,5 +1,8 @@
 package ru.ifmo.rain.khlytin.i18n;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
 public class Report {
@@ -28,10 +31,11 @@ public class Report {
     private final StatisticalData currencies;
     private final StatisticalData dates;
     private final String textFile;
+    private final BufferedWriter writer;
 
     Report(final ResourceBundle bundle, final StatisticalData sentences, final StatisticalData lines,
            final StatisticalData words, final StatisticalData numbers, final StatisticalData currencies,
-           final StatisticalData dates, final String textFile) {
+           final StatisticalData dates, final String textFile, final BufferedWriter writer) {
         this.bundle = bundle;
         this.sentences = sentences;
         this.lines = lines;
@@ -40,346 +44,261 @@ public class Report {
         this.currencies = currencies;
         this.dates = dates;
         this.textFile = textFile;
+        this.writer = writer;
     }
-    //should use messageFormat
-    //: should be in bundles
-    //one string is a very bad idea
-    public String getReport() {
-        return String.format(
-                HTML + EOLN +
-                        HEAD + EOLN +
-                        META + EOLN +
-                        TITLE + EOLN +
-                        HEAD_CLOSE + EOLN +
-                        BODY + EOLN +
-                        H1 + "%s: %s" + H1_CLOSE + EOLN +
 
-                        P + B + "%s:" + B_CLOSE + BR +
-                        "%s %s: %d" + BR +
-                        "%s %s: %d" + BR +
-                        "%s %s: %d" + BR +
-                        "%s %s: %d" + BR +
-                        "%s %s: %d" + BR +
-                        "%s %s: %d" + BR + P_CLOSE +
+    public void handle() throws IOException {
+        writer.write(HTML + EOLN +
+                HEAD + EOLN +
+                META + EOLN +
+                TITLE + EOLN +
+                HEAD_CLOSE + EOLN +
+                BODY + EOLN);
 
-                        P + B + "%s:" + B_CLOSE + BR +
-                        "%s %s: %d (%d %s)" + BR +
-                        "%s %s: %s" + BR +
-                        "%s %s: %s" + BR +
-                        "%s %s %s: %d (%s)" + BR +
-                        "%s %s %s: %d (%s)" + BR +
-                        "%s %s %s: %f" + BR + P_CLOSE +
-
-                        P + B + "%s:" + B_CLOSE + BR +
-                        "%s %s: %d (%d %s)" + BR +
-                        "%s %s: %s" + BR +
-                        "%s %s: %s" + BR +
-                        "%s %s %s: %d (%s)" + BR +
-                        "%s %s %s: %d (%s)" + BR +
-                        "%s %s %s: %f" + BR + P_CLOSE +
-
-                        P + B + "%s:" + B_CLOSE + BR +
-                        "%s %s: %d (%d %s)" + BR +
-                        "%s %s: %s" + BR +
-                        "%s %s: %s" + BR +
-                        "%s %s %s: %d (%s)" + BR +
-                        "%s %s %s: %d (%s)" + BR +
-                        "%s %s %s: %f" + BR + P_CLOSE +
-
-                        P + B + "%s:" + B_CLOSE + BR +
-                        "%s %s: %d (%d %s)" + BR +
-                        "%s %s: %s" + BR +
-                        "%s %s: %s" + BR +
-                        "%s %s %s: %d (%s)" + BR +
-                        "%s %s %s: %d (%s)" + BR +
-                        "%s %s: %f" + BR + P_CLOSE +
-
-                        P + B + "%s:" + B_CLOSE + BR +
-                        "%s %s: %d (%d %s)" + BR +
-                        "%s %s: %s" + BR +
-                        "%s %s: %s" + BR +
-                        "%s %s %s: %d (%s)" + BR +
-                        "%s %s %s: %d (%s)" + BR +
-                        "%s %s: %f" + BR + P_CLOSE +
-
-                        P + B + "%s:" + B_CLOSE + BR +
-                        "%s %s: %d (%d %s)" + BR +
-                        "%s %s: %s" + BR +
-                        "%s %s: %s" + BR +
-                        "%s %s %s: %d (%s)" + BR +
-                        "%s %s %s: %d (%s)" + BR +
-                        "%s %s %s: %f" + BR + P_CLOSE +
-
-                        BODY_CLOSE + EOLN +
-                        HTML_CLOSE,
-
+        writer.write(MessageFormat.format(H1 + "{2}{0}{1}{3}" + H1_CLOSE + EOLN,
+                bundle.getString("colon"),
+                bundle.getString("space"),
                 bundle.getString("analyzedFile"),
-                textFile,
+                textFile));
 
-                //
-
+        writer.write(MessageFormat.format(
+                P + B + "{2}{0}" + B_CLOSE + BR +
+                        "{3}{1}{4}{0}{1}{5}" + BR +
+                        "{3}{1}{6}{0}{1}{7}" + BR +
+                        "{3}{1}{8}{0}{1}{9}" + BR +
+                        "{3}{1}{10}{0}{1}{11}" + BR +
+                        "{3}{1}{12}{0}{1}{13}" + BR +
+                        "{3}{1}{14}{0}{1}{15}" + BR + P_CLOSE,
+                bundle.getString("colon"),
+                bundle.getString("space"),
                 bundle.getString("commonStatistics"),
-
                 bundle.getString("Number"),
                 bundle.getString("sentences"),
                 sentences.occurrencesNumber,
-
-                bundle.getString("Number"),
                 bundle.getString("strings"),
                 lines.occurrencesNumber,
-
-                bundle.getString("Number"),
                 bundle.getString("words"),
                 words.occurrencesNumber,
-
-                bundle.getString("Number"),
                 bundle.getString("numbers"),
                 numbers.occurrencesNumber,
-
-                bundle.getString("Number"),
                 bundle.getString("money"),
                 currencies.occurrencesNumber,
-
-                bundle.getString("Number"),
                 bundle.getString("dates"),
-                dates.occurrencesNumber,
+                dates.occurrencesNumber));
 
-                //
+        MessageFormat pattern = new MessageFormat(
+                P + B + "{4}{0}" + B_CLOSE + BR +
+                        "{5}{1}{6}{0}{1}{7}{1}{2}{8}{1}{9}{3}" + BR +
+                        "{10}{1}{11}{0}{1}{12}" + BR +
+                        "{13}{1}{14}{0}{1}{15}" + BR +
+                        "{16}{1}{17}{1}{18}{0}{1}{19}{1}{2}{20}{3}" + BR +
+                        "{21}{1}{22}{1}{23}{0}{1}{24}{1}{2}{25}{3}" + BR +
+                        "{26}{1}{27}{1}{28}{0}{1}{29}" + BR + P_CLOSE);
 
+        writer.write(pattern.format(new Object[]{
+                bundle.getString("colon"),
+                bundle.getString("space"),
+                bundle.getString("openBracket"),
+                bundle.getString("closeBracket"),
                 bundle.getString("sentenceStatistics"),
-
                 bundle.getString("Number"),
                 bundle.getString("sentences"),
                 sentences.occurrencesNumber,
-
                 sentences.diffValuesNumber,
                 bundle.getString("unique"),
-
                 bundle.getString("min"),
                 bundle.getString("sentence"),
                 sentences.minStringValue,
-
                 bundle.getString("max"),
                 bundle.getString("sentence"),
                 sentences.maxStringValue,
-
                 bundle.getString("minimal"),
                 bundle.getString("length"),
                 bundle.getString("sentenceRP"),
                 (sentences.minLengthString != null) ?
                         sentences.minLengthString.length() : 0,
-
                 sentences.minLengthString,
-
                 bundle.getString("maximal"),
                 bundle.getString("length"),
                 bundle.getString("sentenceRP"),
                 (sentences.maxLengthString != null) ?
                         sentences.maxLengthString.length() : 0,
-
                 sentences.maxLengthString,
-
                 bundle.getString("middle"),
                 bundle.getString("length"),
                 bundle.getString("sentenceRP"),
-                sentences.average,
+                sentences.average}));
 
-                //
-
+        writer.write(pattern.format(new Object[]{
+                bundle.getString("colon"),
+                bundle.getString("space"),
+                bundle.getString("openBracket"),
+                bundle.getString("closeBracket"),
                 bundle.getString("stringStatistics"),
-
                 bundle.getString("Number"),
                 bundle.getString("strings"),
                 lines.occurrencesNumber,
-
                 lines.diffValuesNumber,
                 bundle.getString("unique"),
-
                 bundle.getString("minimal"),
                 bundle.getString("string"),
                 lines.minStringValue,
-
                 bundle.getString("maximal"),
                 bundle.getString("string"),
                 lines.maxStringValue,
-
                 bundle.getString("minimal"),
                 bundle.getString("length"),
                 bundle.getString("stringRP"),
                 (lines.minLengthString != null) ?
                         lines.minLengthString.length() : 0,
-
                 lines.minLengthString,
-
                 bundle.getString("maximal"),
                 bundle.getString("length"),
                 bundle.getString("stringRP"),
                 (lines.maxLengthString != null) ?
                         lines.maxLengthString.length() : 0,
-
                 lines.maxLengthString,
-
                 bundle.getString("middle"),
                 bundle.getString("length"),
                 bundle.getString("stringRP"),
-                lines.average,
+                lines.average}));
 
-                //
-
+        writer.write(pattern.format(new Object[]{
+                bundle.getString("colon"),
+                bundle.getString("space"),
+                bundle.getString("openBracket"),
+                bundle.getString("closeBracket"),
                 bundle.getString("wordStatistics"),
-
                 bundle.getString("Number"),
                 bundle.getString("words"),
                 words.occurrencesNumber,
-
                 words.diffValuesNumber,
                 bundle.getString("unique"),
-
                 bundle.getString("min"),
                 bundle.getString("word"),
                 words.minStringValue,
-
                 bundle.getString("max"),
                 bundle.getString("word"),
                 words.maxStringValue,
-
                 bundle.getString("minimal"),
                 bundle.getString("length"),
                 bundle.getString("wordRP"),
                 (words.minLengthString != null) ?
                         words.minLengthString.length() : 0,
-
                 words.minLengthString,
-
                 bundle.getString("maximal"),
                 bundle.getString("length"),
                 bundle.getString("wordRP"),
                 (words.maxLengthString != null) ?
                         words.maxLengthString.length() : 0,
-
                 words.maxLengthString,
-
                 bundle.getString("middle"),
                 bundle.getString("length"),
                 bundle.getString("wordRP"),
-                words.average,
+                words.average}));
 
-                //
-
+        writer.write(pattern.format(new Object[]{
+                bundle.getString("colon"),
+                bundle.getString("space"),
+                bundle.getString("openBracket"),
+                bundle.getString("closeBracket"),
                 bundle.getString("numberStatistics"),
-
                 bundle.getString("Number"),
                 bundle.getString("numbers"),
                 numbers.occurrencesNumber,
-
                 numbers.diffValuesNumber,
                 bundle.getString("unique"),
-
                 bundle.getString("min"),
                 bundle.getString("number"),
                 numbers.minStringValue,
-
                 bundle.getString("max"),
                 bundle.getString("number"),
                 numbers.maxStringValue,
-
                 bundle.getString("minimal"),
                 bundle.getString("length"),
                 bundle.getString("numberRP"),
                 (numbers.minLengthString != null) ?
                         numbers.minLengthString.length() : 0,
-
                 numbers.minLengthString,
-
                 bundle.getString("maximal"),
                 bundle.getString("length"),
                 bundle.getString("numberRP"),
                 (numbers.maxLengthString != null) ?
                         numbers.maxLengthString.length() : 0,
-
                 numbers.maxLengthString,
-
                 bundle.getString("mid"),
                 bundle.getString("number"),
-                numbers.average,
+                "",
+                numbers.average}));
 
-                //
-
+        writer.write(pattern.format(new Object[]{
+                bundle.getString("colon"),
+                bundle.getString("space"),
+                bundle.getString("openBracket"),
+                bundle.getString("closeBracket"),
                 bundle.getString("moneyStatistics"),
-
                 bundle.getString("Number"),
                 bundle.getString("money"),
                 currencies.occurrencesNumber,
-
                 currencies.diffValuesNumber,
                 bundle.getString("unique"),
-
                 bundle.getString("min"),
                 bundle.getString("value"),
                 currencies.minStringValue,
-
                 bundle.getString("max"),
                 bundle.getString("value"),
                 currencies.maxStringValue,
-
                 bundle.getString("minimal"),
                 bundle.getString("length"),
                 bundle.getString("money"),
                 (currencies.minLengthString != null) ?
                         currencies.minLengthString.length() : 0,
-
                 currencies.minLengthString,
-
                 bundle.getString("maximal"),
                 bundle.getString("length"),
                 bundle.getString("money"),
                 (currencies.maxLengthString != null) ?
                         currencies.maxLengthString.length() : 0,
-
                 currencies.maxLengthString,
-
                 bundle.getString("mid"),
                 bundle.getString("value"),
-                currencies.average,
+                "",
+                currencies.average}));
 
-                //
-
+        writer.write(pattern.format(new Object[]{
+                bundle.getString("colon"),
+                bundle.getString("space"),
+                bundle.getString("openBracket"),
+                bundle.getString("closeBracket"),
                 bundle.getString("dateStatistics"),
-
                 bundle.getString("Number"),
                 bundle.getString("dates"),
                 dates.occurrencesNumber,
-
                 dates.diffValuesNumber,
                 bundle.getString("unique"),
-
                 bundle.getString("minimal"),
                 bundle.getString("date"),
                 dates.minStringValue,
-
                 bundle.getString("maximal"),
                 bundle.getString("date"),
                 dates.maxStringValue,
-
                 bundle.getString("minimal"),
                 bundle.getString("length"),
                 bundle.getString("dateRP"),
                 (dates.minLengthString != null) ?
                         dates.minLengthString.length() : 0,
-
                 dates.minLengthString,
-
                 bundle.getString("maximal"),
                 bundle.getString("length"),
                 bundle.getString("dateRP"),
                 (dates.maxLengthString != null) ?
                         dates.maxLengthString.length() : 0,
-
                 dates.maxLengthString,
-
                 bundle.getString("middle"),
                 bundle.getString("length"),
                 bundle.getString("dateRP"),
-                dates.average);
+                dates.average}));
+
+        writer.write(BODY_CLOSE + EOLN + HTML_CLOSE);
     }
 }
