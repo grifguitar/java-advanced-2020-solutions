@@ -19,15 +19,18 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class HelloUDPNonblockingServer implements HelloServer {
+    //finals?
     private static final int TERMINATION_AWAIT = 1;
     private Selector selector;
     private DatagramChannel channel;
     private ExecutorService mainExecutor;
     private ExecutorService workers;
+    //LinkedDeque not queue?
     private ConcurrentLinkedDeque<PacketData> sendingQueue;
     private ConcurrentLinkedDeque<PacketData> receivingQueue;
 
     public static void main(String[] args) {
+        //copypaste
         if (args == null || args.length != 2 || Arrays.stream(args).anyMatch(Objects::isNull)) {
             System.err.println("No null arguments expected: port threads");
         } else {
