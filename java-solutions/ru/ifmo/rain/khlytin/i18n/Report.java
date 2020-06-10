@@ -89,7 +89,7 @@ public class Report {
 
         MessageFormat pattern = new MessageFormat(
                 P + B + "{4}{0}" + B_CLOSE + BR +
-                        "{5}{1}{6}{0}{1}{7}{1}{2}{8}{1}{3}" + BR +
+                        "{5}{1}{6}{0}{1}{7}{1}{2}{8}{3}" + BR +
                         "{10}{1}{11}{0}{1}{12}" + BR +
                         "{13}{1}{14}{0}{1}{15}" + BR +
                         "{16}{1}{17}{1}{18}{0}{1}{19}{1}{2}{20}{3}" + BR +
@@ -99,7 +99,7 @@ public class Report {
         ChoiceFormat numForm = new ChoiceFormat(
                 new double[]{0, 1, 2},
                 new String[]{"{8}{1}" + bundle.getString("unique"),
-                        "{8}{1}" + bundle.getString("uniqueE"),
+                        "{8}{1}{9}",
                         "{8}{1}" + bundle.getString("unique")});
         pattern.setFormatByArgumentIndex(8, numForm);
 
@@ -113,7 +113,7 @@ public class Report {
                 bundle.getString("sentences"),
                 sentences.occurrencesNumber,
                 sentences.diffValuesNumber,
-                bundle.getString("unique"),
+                bundle.getString("uniqueE"),
                 bundle.getString("min"),
                 bundle.getString("sentence"),
                 sentences.minStringValue,
@@ -147,7 +147,7 @@ public class Report {
                 bundle.getString("strings"),
                 lines.occurrencesNumber,
                 lines.diffValuesNumber,
-                bundle.getString("unique"),
+                bundle.getString("uniqueA"),
                 bundle.getString("minimal"),
                 bundle.getString("string"),
                 lines.minStringValue,
@@ -181,7 +181,7 @@ public class Report {
                 bundle.getString("words"),
                 words.occurrencesNumber,
                 words.diffValuesNumber,
-                bundle.getString("unique"),
+                bundle.getString("uniqueE"),
                 bundle.getString("min"),
                 bundle.getString("word"),
                 words.minStringValue,
@@ -215,7 +215,7 @@ public class Report {
                 bundle.getString("numbers"),
                 numbers.occurrencesNumber,
                 numbers.diffValuesNumber,
-                bundle.getString("unique"),
+                bundle.getString("uniqueE"),
                 bundle.getString("min"),
                 bundle.getString("number"),
                 numbers.minStringValue,
@@ -249,7 +249,7 @@ public class Report {
                 bundle.getString("money"),
                 currencies.occurrencesNumber,
                 currencies.diffValuesNumber,
-                bundle.getString("unique"),
+                bundle.getString("uniqueA"),
                 bundle.getString("min"),
                 bundle.getString("value"),
                 currencies.minStringValue,
@@ -283,7 +283,7 @@ public class Report {
                 bundle.getString("dates"),
                 dates.occurrencesNumber,
                 dates.diffValuesNumber,
-                bundle.getString("unique"),
+                bundle.getString("uniqueA"),
                 bundle.getString("minimal"),
                 bundle.getString("date"),
                 dates.minStringValue,

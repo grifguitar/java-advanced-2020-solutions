@@ -15,6 +15,7 @@ public class UsageResourceBundle_en extends ListResourceBundle {
             {"Number", "Number of"},
             {"unique", "unique"},
             {"uniqueE", "unique"},
+            {"uniqueA", "unique"},
             {"sentences", "sentences"},
             {"strings", "lines"},
             {"words", "words"},
