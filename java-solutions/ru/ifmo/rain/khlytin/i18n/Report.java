@@ -2,6 +2,7 @@ package ru.ifmo.rain.khlytin.i18n;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.text.ChoiceFormat;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
@@ -88,12 +89,19 @@ public class Report {
 
         MessageFormat pattern = new MessageFormat(
                 P + B + "{4}{0}" + B_CLOSE + BR +
-                        "{5}{1}{6}{0}{1}{7}{1}{2}{8}{1}{9}{3}" + BR +
+                        "{5}{1}{6}{0}{1}{7}{1}{2}{8}{1}{3}" + BR +
                         "{10}{1}{11}{0}{1}{12}" + BR +
                         "{13}{1}{14}{0}{1}{15}" + BR +
                         "{16}{1}{17}{1}{18}{0}{1}{19}{1}{2}{20}{3}" + BR +
                         "{21}{1}{22}{1}{23}{0}{1}{24}{1}{2}{25}{3}" + BR +
                         "{26}{1}{27}{1}{28}{0}{1}{29}" + BR + P_CLOSE);
+
+        ChoiceFormat numForm = new ChoiceFormat(
+                new double[]{0, 1, 2},
+                new String[]{"{8}{1}" + bundle.getString("unique"),
+                        "{8}{1}" + bundle.getString("uniqueE"),
+                        "{8}{1}" + bundle.getString("unique")});
+        pattern.setFormatByArgumentIndex(8, numForm);
 
         writer.write(pattern.format(new Object[]{
                 bundle.getString("colon"),

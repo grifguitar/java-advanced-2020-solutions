@@ -14,6 +14,7 @@ public class UsageResourceBundle_en extends ListResourceBundle {
             {"dateStatistics", "Dates statistics"},
             {"Number", "Number of"},
             {"unique", "unique"},
+            {"uniqueE", "unique"},
             {"sentences", "sentences"},
             {"strings", "lines"},
             {"words", "words"},

@@ -14,6 +14,7 @@ public class UsageResourceBundle_ru extends ListResourceBundle {
             {"dateStatistics", "Статистика по датам"},
             {"Number", "Число"},
             {"unique", "уникальных"},
+            {"uniqueE", "уникальный"},
             {"sentences", "предложений"},
             {"strings", "строк"},
             {"words", "слов"},
