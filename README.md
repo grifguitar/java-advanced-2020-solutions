@@ -49,7 +49,9 @@ java-advanced-2020 лежит
 
 Запускать из директории `java-advanced-2020-solutions\out\production>`:
 
-```java -cp .\java-advanced-2020-solutions -p ..\..\java-advanced-2020\lib;..\..\java-advanced-2020\artifacts -m info.kgeorgiy.java.advanced.implementor jar-class ru.ifmo.rain.khlytin.implementor.JarImplementor```
+```bash
+java -cp .\java-advanced-2020-solutions -p ..\..\java-advanced-2020\lib;..\..\java-advanced-2020\artifacts -m info.kgeorgiy.java.advanced.implementor jar-class ru.ifmo.rain.khlytin.implementor.JarImplementor
+```
 
 ### Домашнее задание 10. HelloUDP
 
