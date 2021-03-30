@@ -8,7 +8,7 @@
 
 Домашние задания рассчитывают на то, что рядом с репозиторием java-advanced-2020-solutions в директории
 java-advanced-2020 лежит
-клон [java-advanced-2020](https://github.com/grifguitar/java-advanced-2020-solutions/tree/master/java-advanced-2020)
+клон [java-advanced-2020](https://github.com/grifguitar/java-advanced-2020-solutions/tree/master/java-advanced-2020).
 Пожалуйста, выполните это перед началом работы.
 
 ## Правила игры
