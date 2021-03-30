@@ -1,0 +1,1 @@
+LOcal and remote Persons should be inherited from basic class
